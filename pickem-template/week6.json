@@ -1,0 +1,18 @@
+{
+  "group": "TBSWHP",
+  "week": 6,
+  "graphic": "week6.png",
+  "siteUrl": "https://YOUR-USERNAME.github.io/YOUR-REPO",
+  "matchups": [
+    {"left": {"seed": 10, "name": "Prince Andrew’s Search Histo…", "record": "1-4-0"},
+     "right": {"seed": 1, "name": "Detroit Lions", "record": "5-0-0"}},
+    {"left": {"seed": 2, "name": "Cigarettes after Essex", "record": "4-1-0"},
+     "right": {"seed": 8, "name": "Baron BootCamp 2014", "record": "2-3-0"}},
+    {"left": {"seed": 4, "name": "Mike McDaniel’s Juul", "record": "3-2-0"},
+     "right": {"seed": 3, "name": "Osama Ben Johnson", "record": "3-2-0"}},
+    {"left": {"seed": 9, "name": "Ricky Bobby’s Nightmare", "record": "1-4-0"},
+     "right": {"seed": 6, "name": "Wexner Medical Center", "record": "2-3-0"}},
+    {"left": {"seed": 5, "name": "DKs Antarctic Underworld Fam", "record": "2-3-0"},
+     "right": {"seed": 7, "name": "Goose’s Rehab Facility", "record": "2-3-0"}}
+  ]
+}

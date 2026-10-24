@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#161616">
+<title>TBSWHP Week 6 Pickem</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#161616;--ink:#f4f4f4;--mute:#9a9a9a;--green:#27ff1a;--panel:#232323;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:860px;margin:0 auto;padding:16px 14px 40px}
+h1{font-family:Bangers,Impact,'Arial Narrow',sans-serif;font-weight:400;font-size:clamp(34px,8vw,64px);margin:6px 0 12px;line-height:1;text-align:center;letter-spacing:.5px}
+.hero{width:100%;display:block;border-radius:10px;border:2px solid #ddd;margin-bottom:12px;aspect-ratio:5.47;object-fit:cover;object-position:center 20%}
+.motw{display:block;width:max-content;background:#d3202a;font-style:italic;font-weight:700;padding:2px 14px;margin:0 auto 6px;border-radius:3px;font-size:14px;text-align:center}
+.m{container-type:inline-size;position:relative;margin:0 0 14px;border-radius:10px;overflow:hidden;border:2px solid #ddd;background:#000}
+.m img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+.m button{position:absolute;top:0;bottom:0;border:0;margin:0;padding:0;background:transparent;cursor:pointer;transition:background .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent}
+.m button.a{left:0}.m button.b{right:0}
+.m.has button:not(.on){background:rgba(0,0,0,.55)}
+.m button.on{box-shadow:inset 0 0 0 5px var(--green),inset 0 0 22px 2px rgba(39,255,26,.45)}
+.m button:focus-visible{outline:3px solid #fff;outline-offset:-6px}
+.lb{position:absolute;bottom:2cqw;max-width:40%;pointer-events:none;font-family:Bangers,Impact,'Arial Narrow',sans-serif;line-height:1.02;letter-spacing:.04em;paint-order:stroke fill}
+.lb.l{left:2.2cqw;text-align:left}.lb.r{right:2.2cqw;text-align:right}
+.lb b,.lb i{display:block;font-weight:400;font-style:normal;-webkit-text-stroke-color:var(--s)}
+.lb b{font-size:4cqw;-webkit-text-stroke-width:1.3cqw}.lb i{font-size:3cqw;-webkit-text-stroke-width:1cqw}
+.bar{position:sticky;bottom:0;display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--panel);border:1px solid #3a3a3a;border-radius:12px;padding:10px 12px;margin-top:6px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+.bar span{color:var(--mute);font-size:14px}
+.bar div{display:flex;gap:8px}
+.bar button{font:inherit;font-weight:600;border-radius:8px;padding:9px 14px;border:1px solid #555;background:transparent;color:var(--ink);cursor:pointer}
+.bar button.go{background:var(--green);color:#041a02;border-color:var(--green)}
+.bar button:focus-visible{outline:3px solid #fff}
+#msg{min-height:20px;text-align:center;color:var(--green);font-size:14px;margin-top:8px}
+</style></head><body><main>
+<h1 id="t"></h1>
+<img class="hero" id="hero" alt="">
+<div class="motw">MOTW</div>
+<div id="list"></div>
+<div class="bar"><span id="count"></span><div><button id="reset">Reset</button><button class="go" id="share">Copy my picks</button></div></div>
+<div id="msg" role="status"></div>
+</main>
+<script src="week.js"></script>
+<script>
+const W=window.WEEK,D=W.matchups,KEY='pickem-'+W.group+'-'+W.week;let P=D.map(()=>'');
+document.getElementById('t').textContent=W.title;
+const hero=document.getElementById('hero');hero.src=W.hero;hero.alt=W.title+' banner';
+const list=document.getElementById('list');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const lab=(s,t)=>`<div class="lb ${s}" style="color:${t.fill};--s:${t.stroke}"><b>${esc(t.name)}</b><i>${esc(t.record)}</i></div>`;
+const parse=c=>c&&c.length===D.length?c.split('').map(x=>x==='L'||x==='R'?x:''):null;
+try{P=parse(new URLSearchParams(location.hash.slice(1)).get('p'))||P}catch(e){}
+if(!P.some(Boolean)){try{P=parse(localStorage.getItem(KEY))||P}catch(e){}}
+D.forEach((d,i)=>{
+  const m=document.createElement('div');m.className='m';m.style.aspectRatio=d.ar;
+  m.innerHTML=`<img src="${d.img}" alt="Matchup ${d.l.seed} vs ${d.r.seed}">${lab('l',d.l)}${lab('r',d.r)}<button class="a" style="width:${d.split}%" aria-label="Pick ${esc(d.l.name)}"></button><button class="b" style="width:${100-d.split}%" aria-label="Pick ${esc(d.r.name)}"></button>`;
+  m.querySelector('.a').onclick=()=>pick(i,'L');m.querySelector('.b').onclick=()=>pick(i,'R');
+  list.appendChild(m);d.el=m;
+});
+function pick(i,s){P[i]=P[i]===s?'':s;render();}
+function code(){return P.map(p=>p||'-').join('')}
+function render(){
+  D.forEach((d,i)=>{const m=d.el,a=m.querySelector('.a'),b=m.querySelector('.b');
+    a.classList.toggle('on',P[i]==='L');b.classList.toggle('on',P[i]==='R');
+    a.setAttribute('aria-pressed',P[i]==='L');b.setAttribute('aria-pressed',P[i]==='R');
+    m.classList.toggle('has',!!P[i]);});
+  document.getElementById('count').textContent=P.filter(Boolean).length+' of '+D.length+' picked';
+  try{localStorage.setItem(KEY,code())}catch(e){}
+  try{history.replaceState(null,'','#p='+code())}catch(e){}
+}
+function say(t){const e=document.getElementById('msg');e.textContent=t;setTimeout(()=>e.textContent='',2500)}
+document.getElementById('reset').onclick=()=>{P=D.map(()=>'');render()};
+document.getElementById('share').onclick=async()=>{
+  const picks=D.map((d,i)=>P[i]?(P[i]==='L'?d.l.seed:d.r.seed):'?').join(', ');
+  const txt='My '+W.group+' Week '+W.week+' picks: '+picks+'\n'+location.href.split('#')[0]+'#p='+code();
+  try{await navigator.clipboard.writeText(txt);say('Copied. Paste it anywhere to share.')}
+  catch(e){say('Copy failed. Long-press the address bar to copy the link.')}
+};
+render();
+</script></body></html>
