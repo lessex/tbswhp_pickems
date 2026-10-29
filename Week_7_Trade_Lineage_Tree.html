@@ -1,0 +1,110 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>TBSWHP Trade Tree</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f1f5f2;--card:#fff;--ink:#17201b;--mut:#5d6b62;--line:#8db89c;--acc:#2f8f55;--hi:#b8a400;--chip:#e3eee6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c2420;--card:#141a17;--ink:#e8f0ea;--mut:#9fb2a6;--line:#8fbf9f;--acc:#a9d9b5;--hi:#d8e84a;--chip:#2b3a32}}
+:root[data-theme="dark"]{--bg:#1c2420;--card:#141a17;--ink:#e8f0ea;--mut:#9fb2a6;--line:#8fbf9f;--acc:#a9d9b5;--hi:#d8e84a;--chip:#2b3a32}
+html,body{height:100%;margin:0}body{background:var(--bg);color:var(--ink);font:13px/1.35 ui-monospace,Menlo,Consolas,monospace}
+.hide{display:none!important}#tv{display:flex;flex-direction:column;height:100%}
+select,button,input{font:inherit;color:var(--ink);background:var(--chip);border:1px solid var(--line);border-radius:6px;padding:7px 10px;max-width:100%;box-sizing:border-box}button{cursor:pointer}
+#lp{max-width:1000px;margin:0 auto;padding:18px 14px}h1{font-size:16px;margin:0 0 12px}
+.sb{border:2px solid var(--line);border-radius:10px;padding:12px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end}
+@media(max-width:760px){.sb{grid-template-columns:1fr 1fr}.sb .w{grid-column:1/3}}
+.sb label{display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase}
+.sb button{background:var(--acc);color:var(--bg);font-weight:700}
+.hint{color:var(--mut);margin:10px 0}.card{border:2px solid var(--line);border-radius:10px;margin:12px 0;background:var(--card)}
+.ch{display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);font-weight:700;font-size:15px}.ch span{color:var(--mut);font-weight:400;font-size:12px}
+.cb{display:grid;grid-template-columns:1fr 1fr}.cb>div{padding:10px 14px}.cb>div+div{border-left:1px solid var(--line)}.cb b{display:block;margin-bottom:6px}.cb p{margin:3px 0}.cb em{font-style:normal;color:var(--mut)}
+.cf{display:flex;justify-content:flex-end;padding:8px 14px}
+.d{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:baseline}
+header{padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}header h1{margin:0 8px 0 0}
+.lg{color:var(--mut);padding:0 14px 8px;font-size:12px}.lg b{color:var(--hi)}
+#vp{flex:1;margin:0 14px 14px;border:2px solid var(--line);border-radius:10px;overflow:hidden;position:relative;touch-action:none;cursor:grab}
+#st{position:absolute;left:0;top:0;transform-origin:0 0;padding:30px;width:max-content}
+.node{display:flex;flex-direction:column;align-items:center}
+.kids{display:flex;margin-top:20px;position:relative;align-items:flex-start}
+.kids::before{content:"";position:absolute;top:-20px;left:50%;height:20px;border-left:2px solid var(--line)}
+.c{position:relative;padding:20px 8px 0}.c::before{content:"";position:absolute;top:0;left:50%;height:20px;border-left:2px solid var(--line)}
+.c::after{content:"";position:absolute;top:0;left:0;right:0;border-top:2px solid var(--line)}
+.c:first-child::after{left:50%}.c:last-child::after{right:50%}.c:only-child::after{display:none}
+.kids.col{flex-direction:column;align-items:center}.col>.c{padding-top:12px}.col>.c::before{height:12px}.col>.c::after{display:none}
+.box{background:var(--card);border:2px solid var(--line);border-radius:8px;padding:8px 10px;min-width:170px;max-width:240px}
+.trade{background:var(--chip);text-align:center;font-weight:700}.trade small{display:block;font-weight:400;color:var(--mut)}
+.side .t{font-weight:700}.side .g{color:var(--mut)}.side .g div{color:var(--ink)}.side .g div.f{color:var(--hi);font-weight:700}
+.leaf.on{border-color:var(--hi)}.leaf .n{font-weight:700}.leaf .m{color:var(--mut);font-size:12px}
+.leaf button{margin-top:5px;font-size:12px;padding:3px 7px}
+</style></head><body>
+<div id="lp"><h1>TBSWHP Trade Tree</h1>
+<div class="sb"><label class="w">Player or pick<input id="q" placeholder="Jalen Hurts, or 2027 Round 5"></label>
+<label>Team<select id="tm"><option value="">All teams</option></select></label>
+<label>Trade season<select id="sn"><option value="">Any</option><option value="26">2026–27</option></select></label>
+<label>Draft year of picks<select id="dy"><option value="">Any</option><option value="2027">2027</option></select></label>
+<button id="go">SEARCH</button></div>
+<div class="hint">Looking for a specific pick? Type its draft year and round — <b>2027 Round 5</b>. A round on its own finds every pick in that round.</div>
+<div id="cnt" class="hint"></div><div id="res"></div></div>
+<div id="tv" class="hide"><header><button id="bk">← All trades</button><h1>Trade lineage tree</h1><select id="sel" aria-label="Start trade"></select><button id="fit">Fit entire tree</button><button id="all">Expand all</button><button id="rs">Reset view</button></header>
+<div class="lg">Outlined = <b>traded on (downstream)</b> · plain = still held by the last team shown · picks show original owner</div>
+<div id="vp"><div id="st"></div></div></div>
+<script>
+const D=[[1,"09-08","Dylan","Gavin",0,"Bo Nix","Bo Nix",""],[1,"09-08","Dylan","Gavin",0,"Jayden Reed","Jayden Reed",""],[1,"09-08","Gavin","Dylan",0,"Jalen Hurts","Jalen Hurts",""],[2,"09-09","Logan","AJ",0,"Makai Lemon","Makai Lemon",""],[2,"09-09","Logan","AJ",0,"Sam Darnold","Sam Darnold",""],[2,"09-09","AJ","Logan",0,"Kyler Murray","Kyler Murray",""],[3,"09-11","Thomas","Alex",0,"Jared Goff","Jared Goff",""],[3,"09-11","Thomas","Alex",0,"DeVonta Smith","DeVonta Smith",""],[3,"09-11","Thomas","Alex",0,"D'Andre Swift","D'Andre Swift",""],[3,"09-11","Thomas","Alex",1,"2027 Round 1","2027-R1-Prince Andrew’s Search History","Thomas"],[3,"09-11","Thomas","Alex",1,"2027 Round 2","2027-R2-Prince Andrew’s Search History","Thomas"],[3,"09-11","Thomas","Alex",1,"2027 Round 5","2027-R5-Prince Andrew’s Search History","Thomas"],[3,"09-11","Alex","Thomas",0,"Bijan Robinson","Bijan Robinson",""],[3,"09-11","Alex","Thomas",1,"2027 Round 14","2027-R14-Goose’s Rehab Facility","Alex"],[3,"09-11","Alex","Thomas",1,"2027 Round 15","2027-R15-Goose’s Rehab Facility","Alex"],[3,"09-11","Alex","Thomas",1,"2027 Round 16","2027-R16-Goose’s Rehab Facility","Alex"],[4,"09-11","Logan","Gavin",0,"Jaylen Warren","Jaylen Warren",""],[4,"09-11","Logan","Gavin",0,"Jaylen Waddle","Jaylen Waddle",""],[4,"09-11","Gavin","Logan",0,"Tee Higgins","Tee Higgins",""],[5,"09-13","Thomas","Logan",0,"Marvin Harrison Jr.","Marvin Harrison Jr.",""],[5,"09-13","Thomas","Logan",1,"2027 Round 16","2027-R16-Prince Andrew’s Search History","Thomas"],[5,"09-13","Logan","Thomas",0,"Tre Tucker","Tre Tucker",""],[5,"09-13","Logan","Thomas",1,"2027 Round 9","2027-R9-Cigarettes after Essex","Logan"],[6,"09-17","Logan","Alex",0,"Ashton Jeanty","Ashton Jeanty",""],[6,"09-17","Logan","Alex",1,"2027 Round 16","2027-R16-Cigarettes after Essex","Logan"],[6,"09-17","Alex","Logan",0,"Omarion Hampton","Omarion Hampton",""],[6,"09-17","Alex","Logan",1,"2027 Round 5","2027-R5-Prince Andrew’s Search History","Thomas"],[7,"09-20","Logan","Shaun",0,"Jeremiyah Love","Jeremiyah Love",""],[7,"09-20","Logan","Shaun",1,"2027 Round 1","2027-R1-Cigarettes after Essex","Logan"],[7,"09-20","Logan","Shaun",1,"2027 Round 4","2027-R4-Cigarettes after Essex","Logan"],[7,"09-20","Shaun","Logan",0,"Jayden Daniels","Jayden Daniels",""],[7,"09-20","Shaun","Logan",1,"2027 Round 15","2027-R15-Ricky Bobby's Nightmare","Shaun"],[7,"09-20","Shaun","Logan",1,"2027 Round 16","2027-R16-Ricky Bobby's Nightmare","Shaun"],[8,"09-21","Logan","Thomas",1,"2027 Round 5","2027-R5-Cigarettes after Essex","Logan"],[8,"09-21","Thomas","Logan",1,"2027 Round 15","2027-R15-Prince Andrew’s Search History","Thomas"],[9,"09-23","Thomas","Alex",0,"Lamar Jackson","Lamar Jackson",""],[9,"09-23","Thomas","Alex",0,"Aaron Jones Sr.","Aaron Jones Sr.",""],[9,"09-23","Thomas","Alex",1,"2027 Round 14","2027-R14-Goose’s Rehab Facility","Alex"],[9,"09-23","Alex","Thomas",0,"D'Andre Swift","D'Andre Swift",""],[9,"09-23","Alex","Thomas",0,"Stefon Diggs","Stefon Diggs",""],[9,"09-23","Alex","Thomas",1,"2027 Round 5","2027-R5-Goose’s Rehab Facility","Alex"],[10,"09-23","Alex","Thomas",1,"2027 Round 1","2027-R1-Prince Andrew’s Search History","Thomas"],[10,"09-23","Alex","Thomas",1,"2027 Round 2","2027-R2-Prince Andrew’s Search History","Thomas"],[10,"09-23","Alex","Thomas",1,"2027 Round 4","2027-R4-Goose’s Rehab Facility","Alex"],[10,"09-23","Thomas","Alex",0,"Christian McCaffrey","Christian McCaffrey",""],[10,"09-23","Thomas","Alex",1,"2027 Round 12","2027-R12-Prince Andrew’s Search History","Thomas"],[10,"09-23","Thomas","Alex",1,"2027 Round 13","2027-R13-Cigarettes after Essex","Logan"],[10,"09-23","Thomas","Alex",1,"2027 Round 14","2027-R14-Prince Andrew’s Search History","Thomas"],[11,"09-23","Thomas","Gavin",0,"Davante Adams","Davante Adams",""],[11,"09-23","Thomas","Gavin",0,"Matthew Stafford","Matthew Stafford",""],[11,"09-23","Thomas","Gavin",1,"2027 Round 10","2027-R10-Ricky Bobby's Nightmare","Shaun"],[11,"09-23","Thomas","Gavin",1,"2027 Round 11","2027-R11-Prince Andrew’s Search History","Thomas"],[11,"09-23","Gavin","Thomas",1,"2027 Round 2","2027-R2-Wexner Medical Center","Gavin"],[11,"09-23","Gavin","Thomas",1,"2027 Round 6","2027-R6-Wexner Medical Center","Gavin"],[12,"09-23","Thomas","AJ",0,"Garrett Wilson","Garrett Wilson",""],[12,"09-23","Thomas","AJ",0,"Nico Collins","Nico Collins",""],[12,"09-23","Thomas","AJ",1,"2027 Round 10","2027-R10-Prince Andrew’s Search History","Thomas"],[12,"09-23","AJ","Thomas",0,"Denzel Boston","Denzel Boston",""],[12,"09-23","AJ","Thomas",0,"Emeka Egbuka","Emeka Egbuka",""],[12,"09-23","AJ","Thomas",1,"2027 Round 4","2027-R4-Osama Ben Johnson","AJ"],[16,"09-24","Logan","AJ",0,"Jalen Coker","Jalen Coker",""],[16,"09-24","AJ","Logan",0,"Travis Etienne Jr.","Travis Etienne Jr.",""],[17,"09-25","AJ","Alex",0,"Sam Darnold","Sam Darnold",""],[17,"09-25","Alex","AJ",0,"Kyler Murray","Kyler Murray",""],[18,"09-25","Logan","Alex",0,"Saquon Barkley","Saquon Barkley",""],[18,"09-25","Alex","Logan",0,"George Pickens","George Pickens",""],[19,"09-29","Garrison","Thomas",0,"Drake Maye","Drake Maye",""],[19,"09-29","Garrison","Thomas",1,"2027 Round 2","2027-R2-Baron BootCamp 2014","Garrison"],[19,"09-29","Garrison","Thomas",1,"2027 Round 6","2027-R6-Baron BootCamp 2014","Garrison"],[19,"09-29","Thomas","Garrison",0,"Bijan Robinson","Bijan Robinson",""],[19,"09-29","Thomas","Garrison",1,"2027 Round 14","2027-R14-Ricky Bobby's Nightmare","Shaun"],[19,"09-29","Thomas","Garrison",1,"2027 Round 16","2027-R16-Goose’s Rehab Facility","Alex"],[20,"10-01","Dylan","Thomas",0,"Ladd McConkey","Ladd McConkey",""],[20,"10-01","Thomas","Dylan",0,"Devaughn Vele","Devaughn Vele",""],[21,"10-03","Logan","Dylan",0,"Omarion Hampton","Omarion Hampton",""],[21,"10-03","Logan","Dylan",0,"TreVeyon Henderson","TreVeyon Henderson",""],[21,"10-03","Logan","Dylan",0,"Tee Higgins","Tee Higgins",""],[21,"10-03","Dylan","Logan",0,"Kyren Williams","Kyren Williams",""],[21,"10-03","Dylan","Logan",0,"Parker Washington","Parker Washington",""],[22,"10-03","Thomas","Alex",1,"2027 Round 5","2027-R5-Goose’s Rehab Facility","Alex"],[22,"10-03","Alex","Thomas",0,"Sam Darnold","Sam Darnold",""],[22,"10-03","Alex","Thomas",1,"2027 Round 14","2027-R14-Prince Andrew’s Search History","Thomas"],[23,"10-13","Alex","AJ",0,"Lamar Jackson","Lamar Jackson",""],[23,"10-13","AJ","Alex",0,"Caleb Williams","Caleb Williams",""],[24,"10-17","Logan","AJ",0,"Kyren Williams","Kyren Williams",""],[24,"10-17","Logan","AJ",0,"George Pickens","George Pickens",""],[24,"10-17","AJ","Logan",0,"Jonathan Taylor","Jonathan Taylor",""],[24,"10-17","AJ","Logan",0,"Garrett Wilson","Garrett Wilson",""],[25,"10-17","Alex","AJ",0,"Germie Bernard","Germie Bernard",""],[25,"10-17","AJ","Alex",0,"Luther Burden III","Luther Burden III",""],[26,"10-24","Alex","Dylan",0,"Saquon Barkley","Saquon Barkley",""],[26,"10-24","Alex","Dylan",1,"2027 Round 2","2027-R2-Goose’s Rehab Facility","Alex"],[26,"10-24","Dylan","Alex",0,"Tee Higgins","Tee Higgins",""],[26,"10-24","Dylan","Alex",0,"Sam LaPorta","Sam LaPorta",""],[26,"10-24","Dylan","Alex",1,"2027 Round 16","2027-R16-Mike McDaniel’s Juul","Dylan"],[27,"10-24","Logan","Gavin",0,"Jameson Williams","Jameson Williams",""],[27,"10-24","Logan","Gavin",0,"Isaiah Likely","Isaiah Likely",""],[27,"10-24","Logan","Gavin",0,"Jordan Addison","Jordan Addison",""],[27,"10-24","Gavin","Logan",0,"Trey McBride","Trey McBride",""],[28,"10-24","Thomas","Alex",1,"2027 Round 2","2027-R2-Baron BootCamp 2014","Garrison"],[28,"10-24","Thomas","Alex",1,"2027 Round 2","2027-R2-Wexner Medical Center","Gavin"],[28,"10-24","Thomas","Alex",1,"2027 Round 4","2027-R4-Goose’s Rehab Facility","Alex"],[28,"10-24","Alex","Thomas",0,"Sam LaPorta","Sam LaPorta",""],[28,"10-24","Alex","Thomas",1,"2027 Round 12","2027-R12-Goose’s Rehab Facility","Alex"],[28,"10-24","Alex","Thomas",1,"2027 Round 12","2027-R12-Prince Andrew’s Search History","Thomas"],[28,"10-24","Alex","Thomas",1,"2027 Round 13","2027-R13-Cigarettes after Essex","Logan"],[29,"10-24","Thomas","Logan",0,"Sam LaPorta","Sam LaPorta",""],[29,"10-24","Thomas","Logan",1,"2027 Round 4","2027-R4-Ricky Bobby's Nightmare","Shaun"],[29,"10-24","Logan","Thomas",0,"Trey McBride","Trey McBride",""],[29,"10-24","Logan","Thomas",1,"2027 Round 16","2027-R16-Prince Andrew’s Search History","Thomas"],[30,"10-25","Alex","Dylan",1,"2027 Round 1","2027-R1-Goose’s Rehab Facility","Alex"],[30,"10-25","Dylan","Alex",0,"Amon-Ra St. Brown","Amon-Ra St. Brown",""],[30,"10-25","Dylan","Alex",1,"2027 Round 15","2027-R15-Mike McDaniel’s Juul","Dylan"],[31,"10-27","Logan","Gavin",0,"Sam LaPorta","Sam LaPorta",""],[31,"10-27","Logan","Gavin",1,"2027 Round 9","2027-R9-Cigarettes after Essex","Logan"],[31,"10-27","Gavin","Logan",0,"Dalton Kincaid","Dalton Kincaid",""],[31,"10-27","Gavin","Logan",1,"2027 Round 5","2027-R5-Wexner Medical Center","Gavin"],[32,"10-28","Brandon","Logan",0,"James Cook","James Cook",""],[32,"10-28","Brandon","Logan",1,"2027 Round 15","2027-R15-DKs Antarctic Underworld Fam","Brandon"],[32,"10-28","Logan","Brandon",0,"Jonathan Taylor","Jonathan Taylor",""],[32,"10-28","Logan","Brandon",1,"2027 Round 8","2027-R8-Cigarettes after Essex","Logan"]];
+const C={Logan:'#a9bdf5',Thomas:'#ea6b66',Shaun:'#d9b3ea',Alex:'#9fdfa8',Gavin:'#f6d56f',AJ:'#eda27f',Garrison:'#7fd8cb',Dylan:'#8e7fc0',Brandon:'#6cbcc4',Meg:'#e6cfd9'};
+const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const T={};D.forEach(([id,dt,f,t,pk,nm,key,o])=>{(T[id]=T[id]||{id,dt,mv:[]}).mv.push({f,t,pk,nm,key,o})});
+const ids=Object.keys(T).map(Number).sort((a,b)=>a-b);
+const teams=id=>[...new Set(T[id].mv.flatMap(m=>[m.f,m.t]))];
+const fd=s=>{const[m,d]=s.split('-');return MO[m-1]+'. '+(+d)+', 2026'};
+const dot=n=>`<span class="d" style="background:${C[n]}"></span>${n}`;
+const lab=m=>m.nm+(m.pk?` · ${m.o}`:'');
+const el=(c,h)=>{const e=document.createElement('div');e.className=c;if(h!=null)e.innerHTML=h;return e};
+const $=i=>document.getElementById(i);
+const nextTrade=(key,holder,after)=>ids.find(i=>i>after&&T[i].mv.some(m=>m.key===key&&m.f===holder));
+Object.keys(C).sort().forEach(n=>$('tm').append(new Option(n,n)));
+function search(){
+ const q=$('q').value.toLowerCase().replace(/\brd\b/g,'round').split(/\s+/).filter(Boolean),tm=$('tm').value,dy=$('dy').value;
+ const r=ids.filter(i=>{const mv=T[i].mv;
+  if(tm&&!teams(i).includes(tm))return false;
+  if(dy&&!mv.some(m=>m.pk))return false;
+  const s=mv.map(m=>`${m.nm} ${m.pk?'orig '+m.o:''} from ${m.f}`).join(' ').toLowerCase();
+  return q.every(w=>s.includes(w))});
+ $('cnt').textContent=r.length+' trades';$('res').innerHTML='';
+ r.reverse().forEach(i=>{const[a,b]=teams(i),c=el('card');
+  const side=t=>`<div><b>${dot(t)} received</b>${T[i].mv.filter(m=>m.t===t).map(m=>`<p>${m.nm} <em>from ${m.f}${m.pk&&m.o!==m.f?' (orig. '+m.o+')':''}</em></p>`).join('')}</div>`;
+  c.append(el('ch',`<div>${dot(a)} ⇄ ${dot(b)}</div><span>#${i} · ${fd(T[i].dt)}</span>`),el('cb',side(a)+side(b)));
+  const f=el('cf'),bt=document.createElement('button');bt.textContent='Open trade tree ↗';bt.onclick=()=>open(i);f.append(bt);c.append(f);$('res').append(c)})}
+function tradeNode(id,focus){
+ const n=el('node'),[a,b]=teams(id);
+ n.append(el('box trade',`${dot(a)} ⇄ ${dot(b)}<small>Trade #${id} · ${fd(T[id].dt)}</small>`));
+ const k=el('kids');
+ [a,b].forEach(team=>{
+  const c=el('c'),s=el('node');
+  const gave=T[id].mv.filter(m=>m.f===team).map(m=>`<div class="${m.key===focus?'f':''}">${lab(m)}</div>`).join('');
+  s.append(el('box side',`<div class="t">${dot(team)}</div><div class="g">Gave up${gave}<br>Received ↓</div>`));
+  const lk=el('kids col');
+  T[id].mv.filter(m=>m.t===team).forEach(m=>{const lc=el('c');lc.append(leaf(m,id));lk.append(lc)});
+  s.append(lk);c.append(s);k.append(c)});
+ n.append(k);return n}
+function leaf(m,id){
+ const n=el('node'),nx=nextTrade(m.key,m.t,id);
+ const b=el('box leaf'+(nx?' on':''),`<div class="n">${lab(m)}</div><div class="m">${m.f} → ${m.t}</div><div class="m">${nx?'Traded again':'Held by '+m.t}</div>`);
+ n.append(b);
+ if(nx){const nt=T[nx].mv.find(x=>x.key===m.key&&x.f===m.t).t,btn=document.createElement('button');
+  btn.textContent='+ Follow → '+nt;let kid=null;
+  btn.onclick=()=>{if(kid){kid.remove();kid=null;btn.textContent='+ Follow → '+nt}else{kid=el('kids');const c=el('c');c.append(tradeNode(nx,m.key));kid.append(c);n.append(kid);btn.textContent='— Hide branch'}};
+  b.append(btn)}
+ return n}
+const st=$('st'),vp=$('vp'),sel=$('sel');
+let X=0,Y=0,Z=1;const ap=()=>st.style.transform=`translate(${X}px,${Y}px) scale(${Z})`;
+function fit(){Z=1;ap();const w=st.offsetWidth,h=st.offsetHeight;Z=Math.min(1,vp.clientWidth/w,vp.clientHeight/h);X=(vp.clientWidth-w*Z)/2;Y=8;ap()}
+function render(){st.innerHTML='';st.append(tradeNode(+sel.value,null));fit()}
+function open(i){$('lp').classList.add('hide');$('tv').classList.remove('hide');sel.value=i;render()}
+ids.forEach(i=>{const[a,b]=teams(i);sel.append(new Option(`#${i} · ${fd(T[i].dt)} · ${a} ⇄ ${b}`,i))});
+sel.onchange=render;$('go').onclick=search;$('q').onkeydown=e=>{if(e.key==='Enter')search()};
+['tm','sn','dy'].forEach(i=>$(i).onchange=search);
+$('bk').onclick=()=>{$('tv').classList.add('hide');$('lp').classList.remove('hide')};
+$('fit').onclick=fit;$('rs').onclick=()=>{X=0;Y=0;Z=1;ap()};
+$('all').onclick=()=>{let b;while(b=[...st.querySelectorAll('button')].find(x=>x.textContent.startsWith('+')))b.click();fit()};
+let d=null;vp.onpointerdown=e=>{if(e.target.tagName==='BUTTON')return;d=[e.clientX-X,e.clientY-Y];vp.setPointerCapture(e.pointerId)};
+vp.onpointermove=e=>{if(d){X=e.clientX-d[0];Y=e.clientY-d[1];ap()}};vp.onpointerup=()=>d=null;
+vp.addEventListener('wheel',e=>{e.preventDefault();const r=vp.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,z=Math.min(2,Math.max(.15,Z*(e.deltaY<0?1.1:.9)));X=px-(px-X)*z/Z;Y=py-(py-Y)*z/Z;Z=z;ap()},{passive:false});
+search();
+</script></body></html>
